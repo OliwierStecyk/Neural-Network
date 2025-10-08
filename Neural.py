@@ -16,7 +16,9 @@ import matplotlib
 # random_uniform  uniform 0–1
 # zero → wszystkie wagi zerowe (niezalecane)
 
-class Layer_Dense: ## from https://www.geeksforgeeks.org/machine-learning/weight-initialization-techniques-for-deep-neural-networks/
+## information from https://www.geeksforgeeks.org/machine-learning/weight-initialization-techniques-for-deep-neural-networks/
+
+class Layer_Dense:
     def __init__(self, n_inputs, n_neurons, init_type = "simple", scale = 0.2 ):
         self.output = 0
         init_type = init_type.lower()
@@ -24,7 +26,7 @@ class Layer_Dense: ## from https://www.geeksforgeeks.org/machine-learning/weight
         if init_type == "simple":
             self.weights = scale * np.random.randn(n_inputs, n_neurons )
         elif init_type == "he":
-            self.weights = np.random.randn( n_inputs, n_neurons) * np.sqrt( 2, n_inputs )
+            self.weights = np.random.randn(n_inputs, n_neurons) * np.sqrt(2 / n_inputs)
         elif init_type == "xavier":
             limit = np.sqrt(6 / (n_inputs + n_neurons))
             self.weights = np.random.uniform(-limit, limit, (n_inputs, n_neurons))
@@ -44,6 +46,11 @@ class Layer_Dense: ## from https://www.geeksforgeeks.org/machine-learning/weight
 
     def forward(self, inputs):
         self.output = np.dot(inputs, self.weights) + self.biases
+
+    def backward(self, dvalues ):
+        self.dweights = np.dot( self. inputs.T, dvalues )
+        self.dbiases = np.sum( dvalues, axis = 0, keepdims = True )
+        self.dinputs = np.dot( dvalues, self.weights.T )
 
 ### Activation Classes
 
@@ -103,10 +110,20 @@ class Loss_CategoricalCrossentropy(Loss):
         negative_log_likelihoods = -np.log( correct_confidences )
         return negative_log_likelihoods
 
-class Back: ## https://apxml.com/courses/getting-started-with-pytorch/chapter-6-implementing-training-loop/backpropagation-computing-gradients
+class Loss_MSE(Loss):
+    def forward(self, y_pred, y_true):
+        return np.mean((y_pred - y_true) ** 2, axis=-1)
+
+class Loss_BinaryCrossentropy(Loss):
+    def forward(self, y_pred, y_true):
+        y_pred_clipped = np.clip(y_pred, 1e-7, 1-1e-7)
+        return -(y_true * np.log(y_pred_clipped) + (1 - y_true) * np.log(1 - y_pred_clipped))
+
+class Backpropagation: ## https://apxml.com/courses/getting-started-with-pytorch/chapter-6-implementing-training-loop/backpropagation-computing-gradients
     pass
 
-
+## dzialanie
+# X → Layer1 → Activation1 → Layer2 → Activation2 → Output Loss – obliczamy stratę L(y_pred, y_true) Backward pass – propagujemy gradient straty wstecz, warstwa po warstwie:
 
 
 if __name__ == "__main__":
