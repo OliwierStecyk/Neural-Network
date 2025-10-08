@@ -67,6 +67,22 @@ class Activation_Sigmoid: ## zakres 0 - 1
     def forward(self, inputs):
         self.output = 1 / ( 1 + np.exp(-inputs) )
 
+class Activation_tanh:
+    def forward(self, inputs):
+        self.output = np.tanh( inputs )
+
+class Activation_Elu:
+    def forward(self, inputs, alpha = 1.0 ):
+        self.output = np.where( inputs >= 0, inputs, alpha * ( np.exp( inputs ) - 1 ))
+
+class Activation_Elu:
+    def forward(self, inputs, lambda_=1.0507, alpha=1.67326):
+        self.output = lambda_ * np.where(inputs >= 0, inputs, alpha * (np.exp( inputs ) - 1))
+
+class Activation_gelu:
+    def forward(self, inputs):
+        self.output =  0.5 * inputs * (1 + np.tanh(np.sqrt(2/np.pi) * ( inputs + 0.044715 * inputs**3 )))
+
 ### Losses Classes
 
 class Loss:
