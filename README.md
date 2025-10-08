@@ -80,6 +80,104 @@ python train_iris.py
 
 ---
 
+## **Weight Initialization Techniques**
+
+Initializing weights properly is a crucial step in building a neural network. Proper initialization ensures that:
+
+* Signals propagate through the network without vanishing or exploding.
+* Gradients are stable during backpropagation.
+* Training converges faster and more reliably.
+
+This project allows experimenting with different weight initialization strategies in the `Layer_Dense` class.
+
+### **Available Initialization Methods**
+
+| Method                      | Description                                                                                          | Recommended for                                          |
+| --------------------------- | ---------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| **Simple (scaled normal)**  | Weights are drawn from a normal distribution and scaled by a small constant (`0.1–0.2`).             | Small networks, testing                                  |
+| **He Initialization**       | Random normal distribution scaled by √(2 / n_inputs). Prevents vanishing gradients in deep networks. | ReLU activations                                         |
+| **Xavier / Glorot Uniform** | Uniform distribution between ±√(6 / (n_inputs + n_neurons)).                                         | Sigmoid or tanh activations                              |
+| **Xavier Normal**           | Normal distribution with standard deviation √(2 / (n_inputs + n_neurons)).                           | Sigmoid or tanh activations                              |
+| **Random Normal**           | Standard normal distribution N(0,1).                                                                 | Experimental, not recommended for deep networks          |
+| **Random Uniform**          | Uniform distribution between 0 and 1.                                                                | Experimental                                             |
+| **Zero Initialization**     | All weights set to zero.                                                                             | **Not recommended**: all neurons learn the same features |
+
+### **How to Use in Your Network**
+
+When creating a layer, you can choose the initialization method:
+
+```python
+layer1 = Layer_Dense(n_inputs=4, n_neurons=5, init_type="he")
+layer2 = Layer_Dense(n_inputs=5, n_neurons=3, init_type="xavier")
+```
+
+* This allows you to **experiment with different initializations** to see how they affect training speed and accuracy.
+* You can combine this with different activation functions (ReLU, Sigmoid, Tanh) for best results.
+
+### **References**
+
+* [GeeksforGeeks: Weight Initialization Techniques](https://www.geeksforgeeks.org/machine-learning/weight-initialization-techniques-for-deep-neural-networks/)
+
+---
+
+## **Activation Functions**
+
+This project supports a variety of activation functions for hidden and output layers. Activation functions allow the network to model non-linear relationships in the data.
+
+### **Hidden Layer Activations**
+
+Hidden layers are the intermediate layers between the input and output. Their main purpose is to **learn complex, non-linear patterns** in the data.
+
+| Activation | Output Range | Description                                     | When to Use                                             |
+| ---------- | ------------ | ----------------------------------------------- | ------------------------------------------------------- |
+| **ReLU**   | `[0, ∞)`     | Rectified Linear Unit: `max(0, x)`              | Most common hidden layer activation                     |
+| **PReLU**  | `(-∞, ∞)`    | Parametric ReLU: `x` if x>0 else `alpha*x`      | Helps when ReLU neurons “die” (always 0)                |
+| **tanh**   | `[-1, 1]`    | Hyperbolic tangent                              | Good for symmetric data in hidden layers                |
+| **ELU**    | `(-∞, ∞)`    | Exponential Linear Unit: smooth negative values | Can improve learning compared to ReLU                   |
+| **GELU**   | `(-∞, ∞)`    | Gaussian Error Linear Unit: smooth, non-linear  | Often used in modern architectures (e.g., Transformers) |
+
+**Example:**
+
+```python
+layer_hidden = Layer_Dense(n_inputs=4, n_neurons=5)
+activation_hidden = ActivationReLU()
+activation_hidden.forward(layer_hidden.output)
+```
+
+---
+
+### **Output Layer Activations**
+
+The output layer activation is chosen depending on the **type of problem** you are solving. It ensures that the network output is in a suitable form for the task:
+
+| Activation        | Output Range       | Use Case                                                  |
+| ----------------- | ------------------ | --------------------------------------------------------- |
+| **Sigmoid**       | `[0, 1]`           | Binary classification (output interpreted as probability) |
+| **Softmax**       | `[0, 1]` (sum = 1) | Multi-class classification (probabilities for each class) |
+| **None / Linear** | `(-∞, ∞)`          | Regression tasks                                          |
+
+**Example:**
+
+```python
+layer_output = Layer_Dense(n_inputs=5, n_neurons=3)
+activation_output = Activation_Softmax()
+activation_output.forward(layer_output.output)
+```
+
+---
+
+### **Key Differences**
+
+| Feature           | Hidden Layer                                     | Output Layer                                    |
+| ----------------- | ------------------------------------------------ | ----------------------------------------------- |
+| Purpose           | Learn complex patterns in the data               | Produce final prediction for the task           |
+| Activation choice | Usually non-linear: ReLU, PReLU, tanh, ELU, GELU | Task-specific: Sigmoid, Softmax, or Linear      |
+| Output            | Can have arbitrary range                         | Must match the problem’s expected output        |
+| Example           | `ActivationReLU()`                               | `ActivationSigmoid()` for binary classification |
+
+---
+
+
 ## **License**
 
 This project is open-source and available under the MIT License.
