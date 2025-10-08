@@ -103,7 +103,8 @@ class Loss_CategoricalCrossentropy(Loss):
         negative_log_likelihoods = -np.log( correct_confidences )
         return negative_log_likelihoods
 
-
+class Back: ## https://apxml.com/courses/getting-started-with-pytorch/chapter-6-implementing-training-loop/backpropagation-computing-gradients
+    pass
 
 
 
