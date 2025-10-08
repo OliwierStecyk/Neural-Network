@@ -80,6 +80,43 @@ python train_iris.py
 
 ---
 
+## **Weight Initialization Techniques**
+
+Initializing weights properly is a crucial step in building a neural network. Proper initialization ensures that:
+
+* Signals propagate through the network without vanishing or exploding.
+* Gradients are stable during backpropagation.
+* Training converges faster and more reliably.
+
+This project allows experimenting with different weight initialization strategies in the `Layer_Dense` class.
+
+### **Available Initialization Methods**
+
+| Method                      | Description                                                                                          | Recommended for                                          |
+| --------------------------- | ---------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| **Simple (scaled normal)**  | Weights are drawn from a normal distribution and scaled by a small constant (`0.1–0.2`).             | Small networks, testing                                  |
+| **He Initialization**       | Random normal distribution scaled by √(2 / n_inputs). Prevents vanishing gradients in deep networks. | ReLU activations                                         |
+| **Xavier / Glorot Uniform** | Uniform distribution between ±√(6 / (n_inputs + n_neurons)).                                         | Sigmoid or tanh activations                              |
+| **Xavier Normal**           | Normal distribution with standard deviation √(2 / (n_inputs + n_neurons)).                           | Sigmoid or tanh activations                              |
+| **Random Normal**           | Standard normal distribution N(0,1).                                                                 | Experimental, not recommended for deep networks          |
+| **Random Uniform**          | Uniform distribution between 0 and 1.                                                                | Experimental                                             |
+| **Zero Initialization**     | All weights set to zero.                                                                             | **Not recommended**: all neurons learn the same features |
+
+### **How to Use in Your Network**
+
+When creating a layer, you can choose the initialization method:
+
+```python
+layer1 = Layer_Dense(n_inputs=4, n_neurons=5, init_type="he")
+layer2 = Layer_Dense(n_inputs=5, n_neurons=3, init_type="xavier")
+```
+
+* This allows you to **experiment with different initializations** to see how they affect training speed and accuracy.
+* You can combine this with different activation functions (ReLU, Sigmoid, Tanh) for best results.
+
+### **References**
+
+* [GeeksforGeeks: Weight Initialization Techniques](https://www.geeksforgeeks.org/machine-learning/weight-initialization-techniques-for-deep-neural-networks/)
 
 ---
 
