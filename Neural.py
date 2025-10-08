@@ -20,7 +20,7 @@ class ActivationRelu:
         self.output = np.maximum(0, inputs)
 
 class Activation_PReLU:
-    def __init__(self, alpha = 0.01 ):
+    def __init__(self, alpha = 0.02 ):
         self.alpha = alpha
     def forward(self, inputs ):
         self.output = np.where( inputs > 0, inputs, self.alpha * inputs )
