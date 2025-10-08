@@ -7,29 +7,67 @@ import sys
 import numpy as np
 import matplotlib
 
-class Layer_Dense:
-    def __init__(self, n_inputs, n_neurons ):
+## Usage
+# simple mnożeniem przez stałą scale
+# he  dla ReLU/PReLU
+# xavier →uniform (Glorot)
+# xavier_normal  normal (Glorot)
+# random_normal normal 0–1
+# random_uniform  uniform 0–1
+# zero → wszystkie wagi zerowe (niezalecane)
+
+class Layer_Dense: ## from https://www.geeksforgeeks.org/machine-learning/weight-initialization-techniques-for-deep-neural-networks/
+    def __init__(self, n_inputs, n_neurons, init_type = "simple", scale = 0.2 ):
         self.output = 0
-        self.weights = 0.20 * np.random.randn(n_inputs, n_neurons )
+        init_type = init_type.lower()
+
+        if init_type == "simple":
+            self.weights = scale * np.random.randn(n_inputs, n_neurons )
+        elif init_type == "he":
+            self.weights = np.random.randn( n_inputs, n_neurons) * np.sqrt( 2, n_inputs )
+        elif init_type == "xavier":
+            limit = np.sqrt(6 / (n_inputs + n_neurons))
+            self.weights = np.random.uniform(-limit, limit, (n_inputs, n_neurons))
+        elif init_type == "xavier_noraml":
+            stddev = np.sqrt(2 / (n_inputs + n_neurons))
+            self.weights = np.random.randn(n_inputs, n_neurons) * stddev
+        elif init_type == "random_normal":
+            self.weights = np.random.randn(n_inputs, n_neurons)
+        elif init_type == "random_uniform":
+            self.weights = np.random.uniform(0, 1, (n_inputs, n_neurons))
+        elif init_type == "zero":
+            self.weights = np.zeros(( n_inputs, n_neurons ))
+        else:
+            raise ValueError(f"Nieznany init_type: {init_type}")
+
         self.biases = np.zeros( ( 1, n_neurons ))
+
     def forward(self, inputs):
         self.output = np.dot(inputs, self.weights) + self.biases
 
-class ActivationRelu:
+### Activation Classes
+
+class ActivationRelu: ## warstwy ukryte
     def forward(self, inputs):
         self.output = np.maximum(0, inputs)
 
-class Activation_PReLU:
+class Activation_PReLU: ## warstwy ukryte, gdy ReLU nie może
     def __init__(self, alpha = 0.02 ):
         self.alpha = alpha
     def forward(self, inputs ):
         self.output = np.where( inputs > 0, inputs, self.alpha * inputs )
 
-class Activation_Softmax: ## for overflowing we are doing v = v - max(v)
+class Activation_Softmax: ## for overflowing we are doing v = v - max(v) // wieloklasowe wyjście
     def forward(self, inputs ):
         exp_values =  np.exp( inputs - np.max( inputs, axis = 1, keepdims = True ) )
-        self.output = np.exp(exp_values)/ sum( np.exp(exp_values, axis = 1, keepdims = True))
+        self.output = exp_values / np.sum(exp_values, axis=1, keepdims=True)
         ## output == propabilities
+
+class Activation_Sigmoid: ## zakres 0 - 1
+    def forward(self, inputs):
+        self.output = 1 / ( 1 + np.exp(-inputs) )
+
+### Losses Classes
 
 class Loss:
     def calculate(self, output, y ):
